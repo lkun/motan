@@ -16,6 +16,8 @@
 
 package com.weibo.api.motan.util;
 
+import com.weibo.api.motan.rpc.DefaultResponse;
+import com.weibo.api.motan.rpc.Response;
 import org.apache.commons.lang3.StringUtils;
 
 import com.weibo.api.motan.common.MotanConstants;
@@ -112,8 +114,12 @@ public class MotanFrameworkUtil {
      * @return
      */
     public static String getFullMethodString(Request request) {
-        return getGroupFromRequest(request) + "_" + request.getInterfaceName() + "." + request.getMethodName() + "("
+        return request.getInterfaceName() + "." + request.getMethodName() + "("
                 + request.getParamtersDesc() + ")";
+    }
+    
+    public static String getGroupMethodString(Request request){
+        return getGroupFromRequest(request) + "_" + getFullMethodString(request);
     }
 
 
@@ -252,5 +258,16 @@ public class MotanFrameworkUtil {
         return local;
     }
     
-    
+    public static String removeAsyncSuffix(String path){
+        if(path != null && path.endsWith(MotanConstants.ASYNC_SUFFIX)){
+            return path.substring(0, path.length() - MotanConstants.ASYNC_SUFFIX.length());
+        }
+        return path;
+    }
+
+    public static Response buildErrorResponse(long requestId, Exception e) {
+        DefaultResponse response = new DefaultResponse(requestId);
+        response.setException(e);
+        return response;
+    }
 }
